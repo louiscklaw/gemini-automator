@@ -1,5 +1,3 @@
-![](./_doc/result.png)
-
 # Gemini Automator
 
 The missing Gemini API interface.
@@ -9,17 +7,20 @@ The server receives questions via HTTP and uses a headless Chrome to query `gemi
 
 ## Architecture
 
-```bash
+```
 source/server/                           # Express.js server (endpoints: /ask_gemini, /thinking_mode)
 source/stub/                             # Test clients (run from host machine)
 docker/                                  # Docker Compose config
 docker/images/jenkins_docker_chromium/   # Docker image (Ubuntu + Chrome + Node.js 20)
+prompts/                                 # Prompt definitions
+_doc/                                    # Documentation and results
 ```
 
 ## Prerequisites
 
-- Docker with external networks `common_network`
-- Container IP: `192.168.xx.yy`
+- Docker with external networks `common_network` and `commont_network1`
+- Container IP: `192.168.11.41`
+- Internal HTTP port: `23000`, HTTPS: `23001`
 
 ## Quick Start
 
@@ -59,7 +60,7 @@ node source/stub/009_test_thinking_mode.js
 Returns available thinking modes.
 
 ```bash
-curl http://192.168.11.41:3000/thinking_mode
+curl http://192.168.11.41:23000/thinking_mode
 # Response: ["Fast", "Thinking"]
 ```
 
@@ -68,7 +69,7 @@ curl http://192.168.11.41:3000/thinking_mode
 Ask a question to Gemini.
 
 ```bash
-curl -X POST http://192.168.11.41:3000/ask_gemini \
+curl -X POST http://192.168.11.41:23000/ask_gemini \
   -H "Content-Type: application/json" \
   -d '{"thinking_mode": "Fast", "question": "Hi, how are you?"}'
 ```
@@ -77,17 +78,19 @@ curl -X POST http://192.168.11.41:3000/ask_gemini \
 
 Key environment variables (set in `docker/gemini_agent_1.yml`):
 
-| Variable              | Default | Description          |
-| --------------------- | ------- | -------------------- |
-| `BROWSER_HEADED_MODE` | 1       | 1=headed, 0=headless |
-| `CUSTOM_PORT`         | 3000    | Internal HTTP port   |
-| `CHROME_CLI`          | —       | URL to open on start |
+| Variable               | Default         | Description                |
+| ---------------------- | --------------- | -------------------------- |
+| `BROWSER_HEADED_MODE`  | 1               | 1=headed, 0=headless       |
+| `CUSTOM_PORT`          | 23000           | Internal HTTP port         |
+| `CUSTOM_HTTPS_PORT`    | 23001           | Internal HTTPS port        |
+| `CHROME_CLI`           | gmail.com       | URL to open on start       |
+| `INSTALL_PACKAGES`     | fonts-noto-cjk  | CJK font support           |
 
 Browser and profile settings are in `source/server/profile_setup.js`.
 
 ## Development
 
-Test stubs are in `source/stub/` and call the server at `http://192.168.11.41:3000`.
+Test stubs are in `source/stub/` and call the server at `http://192.168.11.41:23000`.
 
 ## Image Build (if needed)
 
@@ -95,15 +98,3 @@ Test stubs are in `source/stub/` and call the server at `http://192.168.11.41:30
 cd docker/images/jenkins_docker_chromium
 docker build -t jenkins_docker_chromium .
 ```
-
-## TODO (by ai)
-
-- [ ] Add CSRF token handling for `/ask_gemini` and `/thinking_mode` endpoints
-- [ ] Add API key or token-based authentication
-- [ ] Move hardcoded profile settings (`profile_setup.js`) to environment variables
-- [ ] Fix `BROWSER_HEADED_MODE` logic in `initBrowser.js` (currently inverted — `=== '0'` triggers headed mode)
-- [ ] Change `headless: false` to `headless: !BROWSER_HEADED_MODE` in `initBrowser.js` line 24
-- [ ] Add input validation and rate limiting on `/ask_gemini`
-- [ ] Document or create external Docker networks (`common_network`, `commont_network1`) in setup instructions
-- [ ] Consider request timeout handling (currently 180s hardcoded)
-- [ ] Add logging levels (currently `console.log` everywhere)

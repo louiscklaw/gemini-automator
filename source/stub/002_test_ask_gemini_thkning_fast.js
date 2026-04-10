@@ -1,3 +1,9 @@
+/**
+ * 002_test_ask_gemini_thinking_fast.js
+ * Tests Gemini's "Fast" mode with a web search and summarization request.
+ * Verifies that the server can handle a more complex, internet-dependent query.
+ */
+
 const { THINKING_MODE_FAST } = require('./lib/THINKING_MODES');
 
 (async () => {

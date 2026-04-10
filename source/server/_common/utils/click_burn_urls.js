@@ -1,3 +1,13 @@
+/**
+ * click_burn_urls.js
+ * Defines lists of Carousell (HK) search and category URLs used for "burn browsing".
+ * Random browsing activity keeps accounts active and reduces ban risk.
+ */
+
+/**
+ * Optional burn URLs — randomly selected and browsed for natural activity.
+ * Mix of tech/education/service-related search queries.
+ */
 const optional_carousell_urls = [
   'https://www.carousell.com.hk/q/ai',
   'https://www.carousell.com.hk/q/app',
@@ -61,7 +71,8 @@ const optional_carousell_urls = [
   'https://www.carousell.com.hk/q/自訂功能',
   'https://www.carousell.com.hk/q/表格',
   'https://www.carousell.com.hk/q/開發',
-  //
+
+  // STEM/education category searches
   'https://www.carousell.com.hk/q/AppInventor',
   'https://www.carousell.com.hk/q/Artificial%20Intelligence',
   'https://www.carousell.com.hk/q/Cubetto',
@@ -77,7 +88,8 @@ const optional_carousell_urls = [
   'https://www.carousell.com.hk/q/Scratch',
   'https://www.carousell.com.hk/q/ScratchJr',
   'https://www.carousell.com.hk/q/Web%20Programming',
-  //
+
+  // Services category pages
   'https://www.carousell.com.hk/categories/services-1306/?addRecent=true&search=ai',
   'https://www.carousell.com.hk/categories/services-1306/?addRecent=true&search=gpt',
   'https://www.carousell.com.hk/categories/services-1306/?addRecent=true&search=javascript',
@@ -86,13 +98,18 @@ const optional_carousell_urls = [
   'https://www.carousell.com.hk/categories/services-1306/?addRecent=true&search=vba',
   'https://www.carousell.com.hk/categories/services-1306/?addRecent=true&search=wordpress',
   'https://www.carousell.com.hk/categories/services-1306/?addRecent=true&search=開發',
-  //
+
+  // "Continue shopping" pages
   'https://www.carousell.com.hk/see-all-continue-shopping-for/?keyword=python',
   'https://www.carousell.com.hk/see-all-continue-shopping-for/?keyword=coding',
   'https://www.carousell.com.hk/see-all-continue-shopping-for/?keyword=javascript',
   'https://www.carousell.com.hk/see-all-continue-shopping-for/?keyword=wordpress',
 ];
 
+/**
+ * Mandatory burn URLs — always included in the browsing session.
+ * Covers core tech keywords that should be visited every time.
+ */
 const mandateory_carousell_urls = [
   'https://www.carousell.com.hk/q/python',
   'https://www.carousell.com.hk/q/vba',
@@ -101,9 +118,11 @@ const mandateory_carousell_urls = [
   'https://www.carousell.com.hk/q/Jupyter',
 ];
 
+/** Shuffle and take half of the optional URLs for variety */
 const shuffled_carousell_urls = [...optional_carousell_urls].sort(() => Math.random() - 0.5);
 const sliced_urls = shuffled_carousell_urls.slice(0, Math.ceil(shuffled_carousell_urls.length / 2));
 
+/** Final randomized URL list: mandatory + half of optional, limited to 20 */
 const random_urls = [...mandateory_carousell_urls, ...sliced_urls].slice(1, 20);
 
 module.exports = {

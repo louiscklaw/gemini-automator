@@ -1,5 +1,14 @@
+/**
+ * 009_test_thinking_mode.js
+ * Validates the /thinking_mode endpoint returns the expected modes array.
+ * Exits with code 0 on success, 1 on failure.
+ */
+
 const http = require('http');
 
+/**
+ * Fetches the /thinking_mode endpoint and verifies its response.
+ */
 async function test() {
   const response = await new Promise((resolve, reject) => {
     const req = http.get('http://192.168.11.41:3000/thinking_mode', (res) => {

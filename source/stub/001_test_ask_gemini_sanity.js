@@ -1,3 +1,9 @@
+/**
+ * 001_test_ask_gemini_sanity.js
+ * Basic sanity test: sends a simple question to Gemini via the server
+ * and logs the response. Confirms end-to-end connectivity.
+ */
+
 const { THINKING_MODE_FAST } = require('./lib/THINKING_MODES');
 
 (async () => {
