@@ -1,0 +1,7 @@
+docker/volumes
+
+**/*.del
+**/*.log
+**/*.bak
+
+node_modules

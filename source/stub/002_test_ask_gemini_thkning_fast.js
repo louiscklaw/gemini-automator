@@ -1,0 +1,24 @@
+const { THINKING_MODE_FAST } = require('./lib/THINKING_MODES');
+
+(async () => {
+  try {
+    const payload = {
+      thinking_mode: THINKING_MODE_FAST,
+      question: "please search the internet and summarize the information about 'Zlashy Limited' in about 300 words.",
+    };
+    console.log(payload);
+
+    const response = await fetch('http://192.168.11.41:3000/ask_gemini', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      keepalive: true,
+    });
+
+    const data = await response.json();
+
+    console.log('Response:', data);
+  } catch (error) {
+    console.error('Error:', error.message);
+  }
+})();

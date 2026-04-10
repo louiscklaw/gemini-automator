@@ -1,0 +1,55 @@
+FROM ghcr.io/linuxserver/baseimage-kasmvnc:ubuntujammy
+
+# set version label
+ARG BUILD_DATE
+ARG VERSION
+LABEL build_version="Linuxserver.io version:- ${VERSION} Build-date:- ${BUILD_DATE}"
+LABEL maintainer="thelamer"
+
+# title
+ENV TITLE=Chromium
+
+# # replace shell with bash so we can source files
+RUN rm /bin/sh && ln -s /bin/bash /bin/sh
+
+RUN apt-get update
+RUN apt-get install -qqy wget git curl
+
+# Download and install Node.js (you may need to restart the terminal)
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash
+RUN source ~/.nvm/nvm.sh \
+  && nvm install 20 \
+  && nvm alias default 20 \
+  && nvm use default \
+  && npm install -g yarn
+# && npm config set registry https://registry.npmmirror.com/ \
+
+# Install Chrome
+RUN cd /tmp && wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+RUN cd /tmp && apt-get install -qqy ./google-chrome-stable_current_amd64.deb
+RUN rm -f /tmp/google-chrome-stable_current_amd64.deb
+
+RUN npm i -g yarn
+
+# Set up the working directory
+WORKDIR /app
+
+# ports and volumes
+EXPOSE 3000
+
+VOLUME /config
+
+#  ---
+RUN apt-get update
+RUN apt-get install -qqy openjdk-17-jdk
+RUN apt-get install -qqy psmisc
+
+# ---
+ENV CONDA_PLUGINS_AUTO_ACCEPT_TOS=true
+RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O install_miniconda.sh && \
+  bash install_miniconda.sh -b -p /opt/conda && rm install_miniconda.sh
+ENV PATH="/opt/conda/bin:${PATH}"
+
+RUN conda install python~=3.11.0 pip && \
+    pip install --no-cache-dir requests && \
+    conda clean --all
