@@ -1,0 +1,89 @@
+# gemini_agent_1
+
+services:
+  gemini_agent_1:
+    # TODO: rename me
+    # jenkins_docker_chromium
+    build: ./images/jenkins_docker_chromium # Fix: Use relative path to build context
+
+    restart: on-failure
+
+    networks:
+      # TODO: rename me
+      common_network_11:
+        ipv4_address: 192.168.11.41
+        # vnc port: https://192.168.11.41:23001
+        # servre port (service, endpoint): http://192.168.11.41:3000, http://192.168.11.41:3000/hi
+
+    dns:
+      - 192.168.10.10
+
+    # ports:
+    #   - 50009:23000 # http://192.168.11.20:23000
+    #   - 50010:23001 # https://192.168.11.41:23001
+
+    volumes:
+      - /home/logic/_workspace/task-list/servers/logic-NUC8i5BEH/gemini-automator-tryout-ws/master/002_docker/volumes/chromium/config:/config # Fix: Restore relative path for environment persistence
+      - /home/logic/_workspace/task-list/servers/logic-NUC8i5BEH/gemini-automator-tryout-ws/master/002_docker/volumes/chromium/src:/chromium_src
+      - /home/logic/_workspace/task-list/servers/logic-NUC8i5BEH/gemini-automator-tryout-ws/master/002_docker/volumes/browser_data_dir:/browser_data_dir # Fix: Use relative path for volume
+      - /home/logic/_workspace/task-list/servers/logic-NUC8i5BEH/gemini-automator-tryout-ws/master/003_source:/app # Fix: Use relative path to source code
+      - /home/logic/_workspace/task-list/servers/logic-NUC8i5BEH/gemini-automator-tryout-ws/master/002_docker/volumes/helloworld:/helloworld
+      - /dev/shm:/dev/shm:rw
+
+    environment:
+      - TITLE=gemini_agent_1
+      - FM_HOME=/home/logic/app
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Hong_Kong
+      - CHROME_CLI=https://www.gmail.com/ #optional
+      - CUSTOM_PORT=23000 # Internal port the container listens on for http if it needs to be swapped from the default 3000.
+      - CUSTOM_HTTPS_PORT=23001 # Internal port the container listens on for https if it needs to be swapped from the default 3001.
+      - NO_FULL=1 # Do not autmatically fullscreen applications when using openbox.
+      - LC_ALL=en_US.UTF-8 # Set the locale.
+      - INSTALL_PACKAGES=fonts-noto-cjk
+      #
+      - BROWSER_HEADED_MODE=1 # 1 headed mode, 0 headless mode
+
+      # Jenkins agent configuration
+      - JENKINS_SECRET=763aec5d84daf4bfe97e0278653bf7c5b1aae9c193079d68e5631feb4552a82d
+      - AGENT_NAME=gemini_agent_1
+
+    labels:
+      - hello=world
+
+    healthcheck:
+      test: ['CMD', 'nc', '-z', 'localhost', '6901']
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 180s
+
+    blkio_config:
+      device_read_bps:
+        - path: /dev/nvme0n1
+          rate: '8mb'
+        - path: /dev/nvme0n1
+          rate: '8mb'
+
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2G
+        reservations:
+          cpus: '0.01'
+          memory: 8M
+
+    hostname: gemini_agent_1
+
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '1m'
+        max-file: '3'
+
+    security_opt:
+      - seccomp:unconfined #optional
+
+    shm_size: '4gb'

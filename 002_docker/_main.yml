@@ -1,0 +1,14 @@
+# jenkins-tryout
+# this is the entrypoint of the docker-compose prpject
+
+include:
+  - path: ./gemini_agent_1.yml
+
+networks:
+  default:
+    name: common_network
+    external: true
+
+  common_network_11:
+    name: common_network_11
+    external: true

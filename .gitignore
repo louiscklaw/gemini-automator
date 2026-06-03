@@ -1,7 +1,10 @@
-docker/volumes
+002_docker/volumes/**
 
 **/*.del
 **/*.log
 **/*.bak
 
 node_modules
+
+**/_backup
+
