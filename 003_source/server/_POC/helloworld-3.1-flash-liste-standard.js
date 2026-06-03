@@ -10,7 +10,16 @@
 
 const { initBrowser } = require('../_common/utils/initBrowser.js');
 const { profile_setup } = require('../profile_setup.js');
-const selectorsData = require('./selectors.json');
+const fs = require('fs');
+const path = require('path');
+const { parse } = require('jsonc-parser');
+let selectorsData;
+try {
+  selectorsData = parse(fs.readFileSync(path.join(__dirname, 'selectors.jsonc'), 'utf8'));
+} catch (e) {
+  console.error('Failed to parse selectors.jsonc:', e);
+  process.exit(1);
+}
 
 async function runSanityTest() {
   let browserContext;

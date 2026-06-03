@@ -2,10 +2,26 @@ const express = require('express');
 const app = express();
 var bodyParser = require('body-parser');
 const { askGemini } = require('./lib/ask_gemini');
-const { THINKING_MODE_FAST, THINKING_MODE_THINKING } = require('./lib/THINKING_MODES');
+const fs = require('fs');
+const path = require('path');
+const { parse } = require('jsonc-parser');
+
+/**
+ * Load selectors configuration from JSONC file to allow comments.
+ */
+let selectorsData;
+try {
+  const configPath = path.join(__dirname, '_POC', 'selectors.jsonc');
+  selectorsData = parse(fs.readFileSync(configPath, 'utf8'));
+} catch (err) {
+  console.error('Critical Error: Failed to load or parse ./_POC/selectors.jsonc');
+  console.error(err);
+  process.exit(1);
+}
 
 /**
  * Request queue ensures serialized processing of Gemini queries.
+
  * Each incoming request is appended to the queue via `queue = queue.then(...)`.
  * This prevents concurrent browser sessions from conflicting.
  */
@@ -28,7 +44,7 @@ app.use(
  * Returns available thinking mode options for client reference.
  */
 app.get('/thinking_mode', (req, res) => {
-  res.send([THINKING_MODE_FAST, THINKING_MODE_THINKING]);
+  res.send(Object.keys(selectorsData));
 });
 
 /**

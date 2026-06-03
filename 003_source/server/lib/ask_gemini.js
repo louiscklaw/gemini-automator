@@ -6,8 +6,26 @@
 
 const { initBrowser } = require('../_common/utils/initBrowser');
 const { profile_setup } = require('../profile_setup');
+const fs = require('fs');
+const path = require('path');
+const { parse } = require('jsonc-parser');
+
+/**
+ * Load selectors configuration from JSONC file to allow comments.
+ */
+let selectors;
+try {
+  const configPath = path.join(__dirname, '..', '_POC', 'selectors.jsonc');
+  selectors = parse(fs.readFileSync(configPath, 'utf8'));
+} catch (err) {
+  console.error('Critical Error: Failed to load or parse ../_POC/selectors.jsonc');
+  console.error(err);
+  // We don't process.exit(1) here to allow the server to keep running, 
+  // but askGemini will fail if selectors are missing.
+}
 
 /** Profile configuration for the active Chrome session */
+
 const working_profile = profile_setup['testhelloworld04_tvbhk'];
 
 /**
@@ -36,15 +54,21 @@ async function askGemini(thinkingMode, question) {
     console.log('1: target ready, proceed');
 
     try {
-      // Open thinking mode selector menu
-      const modeThinkingButton = page.locator('[data-test-id="bard-mode-menu-button"]');
-      await modeThinkingButton.click();
-      await page.waitForTimeout(1 * 1000);
+      const config = selectors ? selectors[thinkingMode] : null;
+      if (config) {
+        // Open thinking mode selector menu
+        const modeMenuButton = page.locator('button[data-test-id="bard-mode-menu-button"]');
+        await modeMenuButton.click();
 
-      // Select "Fast" mode (opposite of "Thinking" mode)
-      const modeFastButton = page.locator('[data-test-id="bard-mode-option-fast"]');
-      await modeFastButton.click();
-      await page.waitForTimeout(1 * 1000);
+        // Select model and mode based on config
+        await page.getByText(config.model, { exact: false }).waitFor({ state: 'visible', timeout: 5000 });
+        await page.getByText(config.model, { exact: false }).click({ force: true });
+
+        await page.getByText(config.mode, { exact: false }).waitFor({ state: 'visible', timeout: 5000 });
+        await page.getByText(config.mode, { exact: false }).click();
+      } else {
+        console.warn(`Thinking mode '${thinkingMode}' not found in selectors.jsonc, proceeding with default.`);
+      }
     } catch (modeError) {
       console.log('Mode selection failed, proceeding with default mode:', modeError.message);
     }
