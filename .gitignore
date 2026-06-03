@@ -1,5 +1,6 @@
 002_docker/volumes/**
 
+**/_del*
 **/*.del
 **/*.log
 **/*.bak
