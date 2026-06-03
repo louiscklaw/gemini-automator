@@ -10,7 +10,7 @@
 const socks_server_2 = 'socks5://go-socks5-proxy-2:1080';
 
 /** Base directory for browser profiles */
-const BROWSER_DATA_BASE_DIR = process.env.BROWSER_DATA_DIR || '/tmp/browser_data_dir';
+const BROWSER_DATA_BASE_DIR = process.env.BROWSER_DATA_DIR || '/browser_data_dir';
 
 /** Map of named browser profiles with their respective configurations */
 const profile_setup = {
