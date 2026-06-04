@@ -7,5 +7,5 @@
   "3.5 flash-extend": { "model": "3.5 Thinking", "mode": "Standard" },
   // Final test comment
   "3.1 pro-standard": { "model": "3.1 Pro", "mode": "Standard" },
-  "3.1 pro-extend": { "model": "3.1 Pro", "mode": "Thinking level" }
+  "3.1 pro-extend": { "model": "3.1 Pro", "mode": "Thinking level" },
 }

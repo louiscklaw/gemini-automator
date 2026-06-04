@@ -78,7 +78,14 @@ async function askGemini(thinkingMode, question) {
     // Locate the input textbox and type the question
     const textBox = page.locator('[data-placeholder="Ask Gemini"]');
     await textBox.click();
-    await textBox.pressSequentially(question.replace(/\n/g, ' '), { delay: 50 });
+    // await textBox.pressSequentially(question.replace(/\n/g, ' '), { delay: 5, timeout: 180 * 1000 });
+    const lines = question.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+      await textBox.pressSequentially(lines[i], { delay: 5 });
+      if (i < lines.length - 1) {
+        await textBox.press('Shift+Enter');
+      }
+    }
     await page.waitForTimeout(1 * 1000);
 
     // Submit the question by pressing Enter

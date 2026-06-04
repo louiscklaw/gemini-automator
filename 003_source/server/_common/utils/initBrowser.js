@@ -5,6 +5,7 @@
  */
 
 const { chromium } = require('playwright');
+const fs = require('fs'); // Added fs module for directory copying
 
 /**
  * Reads BROWSER_HEADED_MODE from environment.
@@ -42,19 +43,36 @@ async function initStealthing(page) {
  * @returns {Browser} - Playwright browser instance.
  */
 async function initBrowser({ chrome_data_dir }) {
+
+  // Implementation of cp -r /browser_data_dir/...known_good /browser_data_dir/...
+  try {
+    const backupDir = `${chrome_data_dir}.known_good`;
+    if (fs.existsSync(backupDir)) {
+      console.log(`Restoring browser profile from backup: ${backupDir} -> ${chrome_data_dir}`);
+      fs.rmSync(chrome_data_dir, { recursive: true, force: true });
+      fs.cpSync(backupDir, chrome_data_dir, { recursive: true, force: true });
+    }
+  } catch (cpError) {
+    console.error('Warning: Failed to restore browser profile backup:', cpError);
+    // We don't throw here so the browser can still attempt to start even if backup fails
+  }
+
   try {
     // console.log('initBrowser');
     const browser = await chromium.launchPersistentContext(chrome_data_dir, {
       channel: 'chrome',
       headless: false,
-      screen: { width: 1920, height: 1080 * 3 },
+      screen: { width: 1024, height: 768 },
 
       // proxy: {
       //   server: 'socks5://192.168.10.24:1080',
       // },
+      // 
+      // NOTE: take video requires resources
+      // 
       // recordVideo: {
-      //   dir: './videos/',
-      //   size: { width: 1920, height: 1080 * 3 },
+      //   dir: '/app/videos/',
+      //   size: { width: 1024, height: 768 },
       // },
 
       // userDataDir: chrome_data_dir,
@@ -94,6 +112,8 @@ async function initBrowser({ chrome_data_dir }) {
         '--disable-translate',
         '--disable-web-security',
         '--disable-sync',
+        "--wm-window-animations-disabled",
+        "--animation-duration-scale=0",
 
         /** Hide automation flags from JavaScript detection */
         '--disable-blink-features=AutomationControlled',
@@ -115,7 +135,7 @@ async function initBrowser({ chrome_data_dir }) {
         //
         '--password-store=basic',
         '--shm-size=1gb',
-        `--window-size=1920,${1080 * 3}`,
+        `--window-size=1024,768`,
 
         /** Spoof a common Chrome user agent on Windows */
         '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36',
